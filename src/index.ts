@@ -1,22 +1,65 @@
-import { Command } from "commander";
-import readline from "readline";
+/**
+ * Pizza delivery prompt example
+ * run example by writing `node pizza.js` in your console
+ */
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+import inquirer, { QuestionCollection } from "inquirer";
+import { genBlogString } from "./blog";
+import { exec } from "child_process";
+import { run } from "node:test";
+const BLOG_PATH = "${HOME}/code/blog";
 
-const program = new Command();
+const runCmd = async (cmd: string) => {
+  return new Promise<string>((res, rej) => {
+    exec(cmd, (err, std) => {
+      if (err) {
+        return rej(err);
+      }
+      res(std);
+    });
+  });
+};
 
-program.name("Blog 快速生成工具").version("0.0.1");
+console.log("Hi, welcome to Node Pizza");
 
-program
-  .command("blog")
-  .description("快速生成一片博客，并发布")
-  .argument("<string>", "博客内容")
-  .option("-t, --title <string>", "标题")
-  .option("--tag <string>", "标签")
-  .option("--authors <string>", "作者", "authors")
-  .action((str, options) => {});
+interface BlogAnswers {
+  title: string;
+  authors: string;
+  body: string;
+  tags: string;
+}
 
-program.parse();
+const questions: QuestionCollection<BlogAnswers> = [
+  {
+    type: "input",
+    name: "title",
+    message: "title?",
+  },
+  {
+    type: "input",
+    name: "tags",
+    message: "tags?",
+  },
+  {
+    type: "input",
+    name: "body",
+    message: "body?",
+  },
+];
+
+async function main() {
+  const a = await runCmd(
+    `cd ${BLOG_PATH} && git reset . &&  git checkout . && git clean -df`
+  );
+  return;
+  const answer = await inquirer.prompt(questions);
+  const str = genBlogString({
+    tags: answer.tags.split(","),
+    authors: "Amber",
+    title: answer.title,
+    body: answer.body,
+  });
+  console.log(str);
+}
+
+main();

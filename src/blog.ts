@@ -1,5 +1,5 @@
 import { Dayjs } from "dayjs";
-import inquirer from "";
+import inquirer from "inquirer";
 interface Blog {
   title?: string;
   tags?: string[];
@@ -9,13 +9,13 @@ interface Blog {
 
 export function genBlogString(blog: Blog) {
   return `---
-    title: ${blog.title}
-    tags: [${blog.tags?.join(",") ?? ""}]
-    authors: ${blog.authors}
-    ---
-    
-    # ${blog.title}
-    
-    ${blog.body}
-      `;
+title: ${blog.title}
+tags: [${blog.tags?.join(",") ?? ""}]
+authors: ${blog.authors}
+---
+
+# ${blog.title}
+
+${blog.body}
+  `;
 }

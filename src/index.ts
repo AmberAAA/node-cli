@@ -1,4 +1,10 @@
 import { Command } from "commander";
+import readline from "readline";
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 const program = new Command();
 
@@ -11,30 +17,6 @@ program
   .option("-t, --title <string>", "标题")
   .option("--tag <string>", "标签")
   .option("--authors <string>", "作者", "authors")
-  .action((str, options) => {
-    console.log(
-      genBlog(str, {
-        title: options.title ?? "未命名标题",
-        tags: options.tag ?? "",
-        authors: options.authors,
-      })
-    );
-  });
+  .action((str, options) => {});
 
 program.parse();
-
-export function genBlog(
-  body: string,
-  config: { title: string; tags?: string; authors: string }
-) {
-  return `---
-title: ${config.title}
-tags: [${config.tags ?? ""}]
-authors: ${config.authors}
----
-
-# ${config.title}
-
-${body}
-  `;
-}

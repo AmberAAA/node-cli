@@ -8,6 +8,9 @@
     "test": "jest",
     "build": "tsc"
   },
+  "bin": {
+    "blog": "./lib/index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

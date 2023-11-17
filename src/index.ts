@@ -1,13 +1,11 @@
-/**
- * Pizza delivery prompt example
- * run example by writing `node pizza.js` in your console
- */
-
+#!/usr/bin/env node
 import inquirer, { QuestionCollection } from "inquirer";
-import { genBlogString } from "./blog";
+import { genBlogString } from "./blog.js";
 import { exec } from "child_process";
-import { run } from "node:test";
-const BLOG_PATH = "${HOME}/code/blog";
+import { writeFile } from "fs/promises";
+import dayjs from "dayjs";
+const BLOG_ROOT = `${process.env.HOME}/code/docs`;
+const BLOG_DIR = "/blog";
 
 const runCmd = async (cmd: string) => {
   return new Promise<string>((res, rej) => {
@@ -20,16 +18,20 @@ const runCmd = async (cmd: string) => {
   });
 };
 
-console.log("Hi, welcome to Node Pizza");
-
 interface BlogAnswers {
   title: string;
   authors: string;
   body: string;
   tags: string;
+  filename: string;
 }
 
 const questions: QuestionCollection<BlogAnswers> = [
+  {
+    type: "input",
+    name: "filename",
+    message: "filename?",
+  },
   {
     type: "input",
     name: "title",
@@ -48,10 +50,8 @@ const questions: QuestionCollection<BlogAnswers> = [
 ];
 
 async function main() {
-  const a = await runCmd(
-    `cd ${BLOG_PATH} && git reset . &&  git checkout . && git clean -df`
-  );
-  return;
+  const day = dayjs();
+
   const answer = await inquirer.prompt(questions);
   const str = genBlogString({
     tags: answer.tags.split(","),
@@ -59,7 +59,18 @@ async function main() {
     title: answer.title,
     body: answer.body,
   });
-  console.log(str);
+  // 清空git
+  await runCmd(`cd ${BLOG_ROOT} && git pull`);
+  // 创建文件
+  await writeFile(
+    `${BLOG_ROOT}/${BLOG_DIR}/${day.format("YYYY-MM-DD")}-${
+      answer.filename
+    }.md`,
+    str
+  );
+  await runCmd(
+    `cd ${BLOG_ROOT} && git add . && git commit -m "publish a blog" && git push`
+  );
 }
 
 main();

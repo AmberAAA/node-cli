@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import inquirer, { QuestionCollection } from "inquirer";
+import { confirm, editor } from "@inquirer/prompts";
 import { genBlogString } from "./blog.js";
 import { exec } from "child_process";
 import { writeFile } from "fs/promises";
@@ -43,7 +44,7 @@ const questions: QuestionCollection<BlogAnswers> = [
     message: "tags?",
   },
   {
-    type: "input",
+    type: "editor",
     name: "body",
     message: "body?",
   },
@@ -59,6 +60,9 @@ async function main() {
     title: answer.title,
     body: answer.body,
   });
+  console.log(str);
+  const c = await confirm({ message: "isOK?" });
+  if (!c) return;
   // 清空git
   await runCmd(`cd ${BLOG_ROOT} && git pull`);
   // 创建文件

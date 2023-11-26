@@ -9,7 +9,8 @@
     "build": "tsc"
   },
   "bin": {
-    "blog": "./lib/index.js"
+    "blog": "./lib/index.js",
+    "diary": "./lib/diary.js"
   },
   "keywords": [],
   "author": "",

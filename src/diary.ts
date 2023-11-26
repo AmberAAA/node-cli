@@ -33,7 +33,7 @@ const questions: QuestionCollection<Diary> = [
 ];
 
 export function genDiaryString({ body }: Diary) {
-  const title = dayjs().format("YYYY-MM-DD");
+  const title = dayjs().format("YYYY年MM月DD日");
   return `---
 title: ${title}
 ---

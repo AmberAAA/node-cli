@@ -5,6 +5,7 @@ import { genBlogString } from "./blog.js";
 import { exec } from "child_process";
 import { writeFile } from "fs/promises";
 import dayjs from "dayjs";
+import { input } from "@inquirer/prompts";
 const BLOG_ROOT = `${process.env.HOME}/code/docs`;
 const BLOG_DIR = "/blog";
 
@@ -52,25 +53,30 @@ const questions: QuestionCollection<BlogAnswers> = [
 
 async function main() {
   const day = dayjs();
+  let tags = "";
+  let title = "";
+  let filename = "";
+  let body = "";
+  let flag = false;
+  let state = false;
 
-  const answer = await inquirer.prompt(questions);
-  const str = genBlogString({
-    tags: answer.tags.split(","),
-    authors: "Amber",
-    title: answer.title,
-    body: answer.body,
-  });
-  console.log(str);
-  const c = await confirm({ message: "isOK?" });
-  if (!c) return;
+  while (!flag) {
+    filename = await input({ message: "filename?", default: filename });
+    title = await input({ message: "title?", default: title });
+    tags = await input({ message: "tags?", default: tags });
+    body = await editor({ message: "body?", default: body });
+    console.log(
+      genBlogString({ tags: tags.split(/,|，/), title, body, authors: "Amber" })
+    );
+    flag = await confirm({ message: "ok?", default: false });
+  }
+
   // 清空git
   await runCmd(`cd ${BLOG_ROOT} && git pull`);
   // 创建文件
   await writeFile(
-    `${BLOG_ROOT}/${BLOG_DIR}/${day.format("YYYY-MM-DD")}-${
-      answer.filename
-    }.md`,
-    str
+    `${BLOG_ROOT}/${BLOG_DIR}/${day.format("YYYY-MM-DD")}-${filename}.md`,
+    genBlogString({ tags: tags.split(/,|，/), title, body, authors: "Amber" })
   );
   await runCmd(
     `cd ${BLOG_ROOT} && git add . && git commit -m "publish a blog" && git push`
